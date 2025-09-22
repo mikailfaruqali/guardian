@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="{{ app()->getLocale() }}" dir="ltr">
+<html lang="{{ app()->getLocale() }}" dir="{{ app()->isLocale('ku') ? 'rtl' : 'ltr' }}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>{{ __('Guardian') }} - {{ __('Two-Factor Authentication') }}</title>
+    <title>{{ __('guardian.Guardian') }} - {{ __('guardian.Two-Factor Authentication') }}</title>
     <style>
         * { 
             margin: 0; 
@@ -13,255 +13,215 @@
         }
         
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: #f5f7fa;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
             padding: 20px;
-            direction: ltr;
+            direction: {{ app()->isLocale('ku') ? 'rtl' : 'ltr' }};
         }
         
-        .container {
+        .card {
             background: white;
-            border-radius: 12px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
             width: 100%;
-            max-width: 400px;
-            padding: 0;
-            overflow: hidden;
-        }
-        
-        .header {
+            max-width: 420px;
+            padding: 40px 30px;
             text-align: center;
-            padding: 40px 30px 30px;
-            border-bottom: 1px solid #f0f0f0;
         }
         
-        .app-logo {
-            width: 80px;
-            height: 80px;
-            margin: 0 auto 20px;
-            border-radius: 50%;
-            background: #28a745;
+        .logo {
+            width: 64px;
+            height: 64px;
+            margin: 0 auto 24px;
+            border-radius: 16px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 36px;
+            font-size: 28px;
             color: white;
         }
         
-        .app-logo img {
-            width: 70px;
-            height: 70px;
-            border-radius: 50%;
-        }
-        
-        .header h1 {
-            font-size: 20px;
-            margin-bottom: 5px;
-            color: #333;
+        h1 {
+            font-size: 24px;
             font-weight: 600;
+            color: #1a202c;
+            margin-bottom: 8px;
         }
         
-        .body {
-            padding: 30px;
-        }
-        
-        .alert {
-            padding: 12px 16px;
-            border-radius: 6px;
-            margin-bottom: 20px;
+        .subtitle {
+            color: #718096;
+            margin-bottom: 32px;
             font-size: 14px;
-            border: 1px solid;
         }
         
-        .alert-error {
-            background: #fff5f5;
-            color: #c53030;
-            border-color: #fed7d7;
-        }
-        
-        .qr-section {
+        .setup-box {
+            background: #f7fafc;
+            border: 2px dashed #e2e8f0;
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 24px;
             text-align: center;
-            margin-bottom: 25px;
-            padding: 20px;
-            background: #f8f9fa;
-            border-radius: 8px;
-            border: 1px solid #e9ecef;
+        }
+        
+        .setup-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 16px;
         }
         
         .qr-code {
-            margin: 15px 0;
+            margin: 16px 0;
         }
         
-        .qr-code img {
-            border-radius: 6px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-        }
-        
-        .setup-instructions {
-            background: #f0f8ff;
-            padding: 15px;
-            border-radius: 6px;
-            margin-bottom: 20px;
-            border-left: 4px solid #007bff;
-            font-size: 14px;
-        }
-        
-        .setup-instructions h3 {
-            color: #007bff;
-            margin-bottom: 10px;
-            font-size: 16px;
-            font-weight: 600;
-        }
-        
-        .setup-instructions ol {
-            margin: 0;
-            padding-left: 20px;
-            line-height: 1.5;
-        }
-        
-        .setup-instructions li {
-            margin-bottom: 5px;
-            color: #555;
+        .secret-box {
+            background: #edf2f7;
+            padding: 12px;
+            border-radius: 8px;
+            font-family: monospace;
+            font-size: 12px;
+            word-break: break-all;
+            margin-top: 12px;
+            color: #4a5568;
         }
         
         .form-group {
-            margin-bottom: 20px;
+            margin-bottom: 24px;
+            text-align: left;
         }
         
         label {
             display: block;
-            margin-bottom: 8px;
             font-weight: 500;
-            color: #374151;
+            color: #4a5568;
+            margin-bottom: 8px;
             font-size: 14px;
         }
         
         input {
             width: 100%;
-            padding: 12px 16px;
-            border: 1px solid #d1d5db;
-            border-radius: 6px;
-            font-size: 16px;
+            padding: 16px;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            font-size: 18px;
             text-align: center;
-            letter-spacing: 2px;
-            font-weight: 500;
+            letter-spacing: 4px;
+            font-weight: 600;
             transition: all 0.2s;
-            background: #f9fafb;
+            background: #f7fafc;
         }
         
         input:focus {
             outline: none;
-            border-color: #007bff;
-            box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+            border-color: #667eea;
             background: white;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
         }
         
         .btn {
             width: 100%;
-            padding: 12px 16px;
+            padding: 16px;
             border: none;
-            border-radius: 6px;
-            font-size: 14px;
+            border-radius: 12px;
+            font-size: 16px;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.2s;
-            text-decoration: none;
-            display: inline-block;
-            text-align: center;
-        }
-        
-        .btn-primary {
-            background: #007bff;
+            background: linear-gradient(135deg, #667eea, #764ba2);
             color: white;
+            margin-bottom: 16px;
         }
         
-        .btn-primary:hover {
-            background: #0056b3;
-            transform: translateY(-1px);
-            box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3);
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
         }
         
-        .info {
-            text-align: center;
-            color: #6b7280;
+        .alert {
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin-bottom: 16px;
+            font-size: 14px;
+            border-left: 4px solid;
+        }
+        
+        .alert-error {
+            background: #fed7d7;
+            color: #c53030;
+            border-left-color: #e53e3e;
+        }
+        
+        .info-text {
+            color: #718096;
             font-size: 13px;
-            margin-top: 15px;
-            line-height: 1.4;
+            margin-top: 16px;
+            line-height: 1.5;
         }
         
         @media (max-width: 480px) {
-            .container {
+            .card {
                 margin: 10px;
-                max-width: none;
+                padding: 30px 20px;
             }
-            
-            .header, .body {
-                padding: 20px;
+            .logo {
+                width: 56px;
+                height: 56px;
+                font-size: 24px;
             }
-            
-            .app-logo {
-                width: 60px;
-                height: 60px;
-                font-size: 28px;
+            h1 {
+                font-size: 20px;
             }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <div class="app-logo">
-                🛡️
-            </div>
-            <h1>{{ __('Guardian Security') }}</h1>
-        </div>
-        
-        <div class="body">
-            @if(session('error'))
-                <div class="alert alert-error">{{ session('error') }}</div>
-            @endif
+    <div class="card">
+        <div class="logo">🛡️</div>
+        <h1>{{ __('guardian.Guardian Security') }}</h1>
+        <p class="subtitle">{{ __('guardian.Two-Factor Authentication') }}</p>
 
-            @if(isset($isFirstTime) && $isFirstTime)
-                <div class="setup-instructions">
-                    <h3>{{ __('First-time Setup') }}</h3>
-                    <ol>
-                        <li>{{ __('Install Google Authenticator or similar app') }}</li>
-                        <li>{{ __('Scan the QR code below') }}</li>
-                        <li>{{ __('Enter the 6-digit code from the app') }}</li>
-                    </ol>
-                </div>
+        @if(session('error'))
+            <div class="alert alert-error">{{ session('error') }}</div>
+        @endif
 
-                <div class="qr-section">
-                    <div class="qr-code">
-                        {!! $qrCode !!}
-                    </div>
-                    @if(isset($secret) && $secret)
-                        <div style="margin-top: 15px; padding: 10px; background: #f8f9fa; border-radius: 6px; border: 1px solid #e9ecef;">
-                            <p style="font-size: 12px; color: #6c757d; margin-bottom: 5px;">{{ __('Manual Setup (if QR doesn\'t work):') }}</p>
-                            <p style="font-family: monospace; font-size: 14px; word-break: break-all; color: #333;">{{ $secret }}</p>
-                        </div>
-                    @endif
-                </div>
-            @endif
-
-            <form method="POST" action="{{ route('guardian.authenticator.verify') }}">
-                @csrf
-                <div class="form-group">
-                    <label>{{ __('Enter 6-digit code from your authenticator app') }}</label>
-                    <input type="text" name="code" maxlength="6" placeholder="000000" required autofocus>
+        @if(isset($isFirstTime) && $isFirstTime)
+            <div class="setup-box">
+                <div class="setup-title">{{ __('guardian.First-time Setup') }}</div>
+                <p style="color: #718096; font-size: 13px; margin-bottom: 16px;">
+                    {{ __('guardian.Install Google Authenticator or similar app') }}
+                </p>
+                
+                <div class="qr-code">
+                    {!! $qrCode !!}
                 </div>
                 
-                <button type="submit" class="btn btn-primary">{{ __('Verify Code') }}</button>
-            </form>
-            
-            <div class="info">
-                <p>{{ __('Open your Google Authenticator app to get the verification code') }}</p>
+                @if(isset($secret) && $secret)
+                    <div class="secret-box">
+                        <div style="font-size: 11px; margin-bottom: 4px; color: #718096;">
+                            {{ __('guardian.Manual Setup (if QR doesn\'t work):') }}
+                        </div>
+                        {{ $secret }}
+                    </div>
+                @endif
             </div>
-        </div>
+        @endif
+
+        <form method="POST" action="{{ route('guardian.authenticator.verify') }}">
+            @csrf
+            <div class="form-group">
+                <label>{{ __('guardian.Enter 6-digit code from your authenticator app') }}</label>
+                <input type="text" name="code" maxlength="6" placeholder="000000" required autofocus>
+            </div>
+            
+            <button type="submit" class="btn">{{ __('guardian.Verify Code') }}</button>
+        </form>
+        
+        <p class="info-text">{{ __('guardian.Open your Google Authenticator app to get the verification code') }}</p>
     </div>
 
     <script>

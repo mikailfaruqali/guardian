@@ -24,6 +24,9 @@ A powerful Laravel security package with intelligent dual 2FA authentication, be
 - **Beautiful Email Templates**: Professional, branded email notifications
 - **Master Email Distribution**: Send codes to multiple admin emails
 - **Auto-Resend**: Smart code resending functionality
+- **Multi-Language Support**: English and Kurdish (کوردی) languages included
+- **RTL Support**: Automatic right-to-left layout for Kurdish language
+- **Modern UI**: Clean, simple, gradient-based design with card layout
 
 ## Installation
 

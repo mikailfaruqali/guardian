@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="{{ app()->getLocale() }}" dir="ltr">
+<html lang="{{ app()->getLocale() }}" dir="{{ app()->isLocale('ku') ? 'rtl' : 'ltr' }}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>{{ __('Guardian') }} - {{ __('Email Verification') }}</title>
+    <title>{{ __('guardian.Guardian') }} - {{ __('guardian.Email Verification') }}</title>
     <style>
         * { 
             margin: 0; 
@@ -13,214 +13,186 @@
         }
         
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: #f5f7fa;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
             padding: 20px;
-            direction: ltr;
+            direction: {{ app()->isLocale('ku') ? 'rtl' : 'ltr' }};
         }
         
-        .container {
+        .card {
             background: white;
-            border-radius: 12px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
             width: 100%;
-            max-width: 400px;
-            padding: 0;
-            overflow: hidden;
-        }
-        
-        .header {
+            max-width: 420px;
+            padding: 40px 30px;
             text-align: center;
-            padding: 40px 30px 30px;
-            border-bottom: 1px solid #f0f0f0;
         }
         
-        .app-logo {
-            width: 80px;
-            height: 80px;
-            margin: 0 auto 20px;
-            border-radius: 50%;
-            background: #28a745;
+        .logo {
+            width: 64px;
+            height: 64px;
+            margin: 0 auto 24px;
+            border-radius: 16px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 36px;
+            font-size: 28px;
             color: white;
         }
         
-        .app-logo img {
-            width: 70px;
-            height: 70px;
-            border-radius: 50%;
-        }
-        
-        .header h1 {
-            font-size: 20px;
-            margin-bottom: 5px;
-            color: #333;
+        h1 {
+            font-size: 24px;
             font-weight: 600;
+            color: #1a202c;
+            margin-bottom: 8px;
         }
         
-        .body {
-            padding: 30px;
-        }
-        
-        .alert {
-            padding: 12px 16px;
-            border-radius: 6px;
-            margin-bottom: 20px;
+        .subtitle {
+            color: #718096;
+            margin-bottom: 32px;
             font-size: 14px;
-            border: 1px solid;
-        }
-        
-        .alert-success {
-            background: #f0f9ff;
-            color: #047857;
-            border-color: #a7f3d0;
-        }
-        
-        .alert-error {
-            background: #fff5f5;
-            color: #c53030;
-            border-color: #fed7d7;
         }
         
         .form-group {
-            margin-bottom: 20px;
+            margin-bottom: 24px;
+            text-align: left;
         }
         
         label {
             display: block;
-            margin-bottom: 8px;
             font-weight: 500;
-            color: #374151;
+            color: #4a5568;
+            margin-bottom: 8px;
             font-size: 14px;
         }
         
         input {
             width: 100%;
-            padding: 12px 16px;
-            border: 1px solid #d1d5db;
-            border-radius: 6px;
-            font-size: 16px;
+            padding: 16px;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            font-size: 18px;
             text-align: center;
-            letter-spacing: 2px;
-            font-weight: 500;
+            letter-spacing: 4px;
+            font-weight: 600;
             transition: all 0.2s;
-            background: #f9fafb;
+            background: #f7fafc;
         }
         
         input:focus {
             outline: none;
-            border-color: #007bff;
-            box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+            border-color: #667eea;
             background: white;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
         }
         
         .btn {
             width: 100%;
-            padding: 12px 16px;
+            padding: 16px;
             border: none;
-            border-radius: 6px;
-            font-size: 14px;
+            border-radius: 12px;
+            font-size: 16px;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.2s;
-            text-decoration: none;
-            display: inline-block;
-            text-align: center;
-            margin-bottom: 10px;
-        }
-        
-        .btn-primary {
-            background: #007bff;
+            background: linear-gradient(135deg, #667eea, #764ba2);
             color: white;
+            margin-bottom: 16px;
         }
         
-        .btn-primary:hover {
-            background: #0056b3;
-            transform: translateY(-1px);
-            box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3);
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
         }
         
         .btn-secondary {
-            background: #f8f9fa;
-            color: #6c757d;
-            border: 1px solid #dee2e6;
+            background: linear-gradient(135deg, #e2e8f0, #cbd5e0);
+            color: #4a5568;
         }
         
         .btn-secondary:hover {
-            background: #e9ecef;
-            border-color: #adb5bd;
+            box-shadow: 0 8px 25px rgba(203, 213, 224, 0.3);
         }
         
-        .info {
-            text-align: center;
-            color: #6b7280;
+        .alert {
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin-bottom: 16px;
+            font-size: 14px;
+            border-left: 4px solid;
+        }
+        
+        .alert-success {
+            background: #c6f6d5;
+            color: #22543d;
+            border-left-color: #38a169;
+        }
+        
+        .alert-error {
+            background: #fed7d7;
+            color: #c53030;
+            border-left-color: #e53e3e;
+        }
+        
+        .info-text {
+            color: #718096;
             font-size: 13px;
-            margin-top: 15px;
-            line-height: 1.4;
+            margin-top: 16px;
+            line-height: 1.5;
         }
         
         @media (max-width: 480px) {
-            .container {
+            .card {
                 margin: 10px;
-                max-width: none;
+                padding: 30px 20px;
             }
-            
-            .header, .body {
-                padding: 20px;
+            .logo {
+                width: 56px;
+                height: 56px;
+                font-size: 24px;
             }
-            
-            .app-logo {
-                width: 60px;
-                height: 60px;
-                font-size: 28px;
+            h1 {
+                font-size: 20px;
             }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <div class="app-logo">
-                🔐
-            </div>
-            <h1>{{ __('Guardian Security') }}</h1>
-        </div>
-        
-        <div class="body">
-            @if(session('success'))
-                <div class="alert alert-success">{{ session('success') }}</div>
-            @endif
-            
-            @if(session('error'))
-                <div class="alert alert-error">{{ session('error') }}</div>
-            @endif
+    <div class="card">
+        <div class="logo">🔐</div>
+        <h1>{{ __('guardian.Guardian Security') }}</h1>
+        <p class="subtitle">{{ __('guardian.Email Verification') }}</p>
 
-            <form method="POST" action="{{ route('guardian.email.verify') }}">
-                @csrf
-                <div class="form-group">
-                    <label>{{ __('Enter the 6-digit code from your email') }}</label>
-                    <input type="text" name="code" maxlength="6" placeholder="000000" required autofocus>
-                </div>
-                
-                <button type="submit" class="btn btn-primary">{{ __('Verify Code') }}</button>
-            </form>
-            
-            <form method="POST" action="{{ route('guardian.email.send') }}">
-                @csrf
-                <button type="submit" class="btn btn-secondary">{{ __('Resend Code') }}</button>
-            </form>
-            
-            <div class="info">
-                <p>{{ __('Verification code has been sent to authorized email addresses') }}</p>
+        @if(session('success'))
+            <div class="alert alert-success">{{ session('success') }}</div>
+        @endif
+        
+        @if(session('error'))
+            <div class="alert alert-error">{{ session('error') }}</div>
+        @endif
+
+        <form method="POST" action="{{ route('guardian.email.verify') }}">
+            @csrf
+            <div class="form-group">
+                <label>{{ __('guardian.Enter the 6-digit code from your email') }}</label>
+                <input type="text" name="code" maxlength="6" placeholder="000000" required autofocus>
             </div>
-        </div>
+            
+            <button type="submit" class="btn">{{ __('guardian.Verify Code') }}</button>
+        </form>
+        
+        <form method="POST" action="{{ route('guardian.email.send') }}">
+            @csrf
+            <button type="submit" class="btn btn-secondary">{{ __('guardian.Resend Code') }}</button>
+        </form>
+        
+        <p class="info-text">{{ __('guardian.Verification code has been sent to authorized email addresses') }}</p>
     </div>
 
     <script>
@@ -232,6 +204,3 @@
                 }, 300);
             }
         });
-    </script>
-</body>
-</html>
