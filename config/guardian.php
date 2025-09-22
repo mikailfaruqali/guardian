@@ -72,6 +72,5 @@ return [
 
     'skipped-routes' => [
         'login',
-        'guardian',
     ],
 ];
