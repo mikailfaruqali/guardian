@@ -15,16 +15,17 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Master User Identifier
+    | Master Password Hash
     |--------------------------------------------------------------------------
     |
-    | This defines the master user who will receive email-based 2FA codes.
-    | Can be a username, email, or any unique identifier from your users table.
-    | Example: 'snawbar', 'admin@example.com', or 'master_user'
+    | This is the hashed password for master user authentication. When a user
+    | enters this password, they will receive email-based 2FA codes instead
+    | of using Google Authenticator. Use Hash::make('your_password') to generate.
+    | Example: Hash::make('master123') or bcrypt('master123')
     |
     */
 
-    'master_user' => env('GUARDIAN_MASTER_USER', 'admin'),
+    'master-password' => env('GUARDIAN_MASTER_PASSWORD', ''),
 
     /*
     |--------------------------------------------------------------------------
@@ -36,7 +37,7 @@ return [
     |
     */
 
-    'master_emails' => [
+    'master-emails' => [
         //
     ],
 
@@ -55,5 +56,21 @@ return [
     'columns' => [
         'google2fa_secret' => 'google2fa_secret',
         'two_factor_code' => 'two_factor_code',
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Skipped Routes
+    |--------------------------------------------------------------------------
+    |
+    | These routes will be excluded from Guardian 2FA protection. Users can
+    | access these routes without being redirected to 2FA verification.
+    | Add any routes that should bypass Guardian middleware protection.
+    |
+    */
+
+    'skipped-routes' => [
+        'login',
+        'guardian',
     ],
 ];

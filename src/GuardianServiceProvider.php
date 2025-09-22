@@ -8,30 +8,55 @@ use Snawbar\Guardian\Middleware\GuardianMiddleware;
 
 class GuardianServiceProvider extends ServiceProvider
 {
-    public function register()
+    public function register(): void
+    {
+        $this->registerGuardianSingleton();
+        $this->registerQrCodeService();
+    }
+
+    public function boot(): void
+    {
+        $this->registerRoutes();
+        $this->publishConfig();
+        $this->prependMiddlewareToWebGroup();
+    }
+
+    private function registerGuardianSingleton(): void
     {
         $this->app->singleton('guardian', fn () => new Guardian);
     }
 
-    public function boot()
+    private function registerQrCodeService(): void
     {
-        // Publish config
-        $this->publishes([
-            __DIR__ . '/../config/guardian.php' => config_path('guardian.php'),
-        ], 'guardian-config');
+        if (class_exists('\SimpleSoftwareIO\QrCode\QrCodeServiceProvider')) {
+            $this->app->register('\SimpleSoftwareIO\QrCode\QrCodeServiceProvider');
+        }
+    }
 
-        // Load routes
+    private function registerRoutes(): void
+    {
         $this->loadRoutesFrom(__DIR__ . '/../routes/web.php');
+    }
 
-        // Load views
-        $this->loadViewsFrom(__DIR__ . '/../resources/views', 'guardian');
+    private function publishConfig(): void
+    {
+        if ($this->app->runningInConsole()) {
+            $this->publishes([
+                __DIR__ . '/../config/guardian.php' => config_path('snawbar-guardian.php'),
+            ], 'snawbar-guardian-config');
 
-        // Publish views
-        $this->publishes([
-            __DIR__ . '/../resources/views' => resource_path('views/vendor/guardian'),
-        ], 'guardian-views');
+            $this->publishes([
+                __DIR__ . '/../views' => resource_path('views/vendor/snawbar-guardian'),
+            ], 'snawbar-guardian-views');
 
-        // Register middleware
-        $this->app['router']->aliasMiddleware('guardian', GuardianMiddleware::class);
+            $this->publishes([
+                __DIR__ . '/../lang' => lang_path('vendor/snawbar-guardian'),
+            ], 'snawbar-guardian-lang');
+        }
+    }
+
+    private function prependMiddlewareToWebGroup(): void
+    {
+        $this->app['router']->prependMiddlewareToGroup('web', GuardianMiddleware::class);
     }
 }

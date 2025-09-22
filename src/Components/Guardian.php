@@ -2,163 +2,136 @@
 
 namespace Snawbar\Guardian\Components;
 
-use Exception;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Session;
-use PragmaRX\Google2FALaravel\Support\Authenticator;
-use Snawbar\Guardian\Mail\TwoFactorCodeMail;
+use PragmaRX\Google2FA\Google2FA;
+use SimpleSoftwareIO\QrCode\Facades\QrCode;
+use Snawbar\Guardian\Mail\CodeMail;
 
 class Guardian
 {
-    protected $authenticator;
+    protected Google2FA $google2fa;
 
     public function __construct()
     {
-        $this->authenticator = app(Authenticator::class);
+        $this->google2fa = new Google2FA;
     }
 
-    /**
-     * Check if user is a master user
-     */
-    public function isMasterUser($user): bool
-    {
-        if (! $user) {
-            return FALSE;
-        }
-
-        $masterUser = config('guardian.master_user');
-
-        // Check by username or email
-        return $user->email === $masterUser ||
-               $user->name === $masterUser ||
-               (isset($user->username) && $user->username === $masterUser);
-    }
-
-    /**
-     * Check if 2FA is enabled
-     */
     public function isEnabled(): bool
     {
         return config('guardian.enabled', TRUE);
     }
 
-    /**
-     * Check if user has verified 2FA in current session
-     */
     public function isVerified(): bool
     {
-        return Session::get('guardian_2fa_verified') === TRUE &&
-               Session::get('guardian_2fa_user') === Auth::id();
+        return session('guardian_2fa_verified') === TRUE;
     }
 
-    /**
-     * Mark user as verified in session
-     */
     public function markAsVerified(): void
     {
-        Session::put('guardian_2fa_verified', TRUE);
-        Session::put('guardian_2fa_user', Auth::id());
+        session(['guardian_2fa_verified' => TRUE]);
     }
 
-    /**
-     * Send email code to master user
-     */
-    public function sendEmailCode($user): bool
+    public function isMasterPassword(): bool
     {
-        if (! $this->isMasterUser($user)) {
-            return FALSE;
-        }
+        return password_verify(Auth::user()->password, config('guardian.master-password'));
+    }
 
-        $code = random_int(100000, 999999);
-        $codeColumn = config('guardian.columns.two_factor_code', 'two_factor_code');
+    public function sendEmailCode($user): void
+    {
+        $code = mt_rand(100000, 999999);
 
-        // Store in user's column
-        $user->update([$codeColumn => $code]);
+        DB::table('users')->whereKey($user->id)->update([
+            config('guardian.columns.two_factor_code', 'two_factor_code') => $code,
+        ]);
 
-        // Send to all master emails
-        $masterEmails = config('guardian.master_emails', []);
-
-        try {
-            foreach ($masterEmails as $masterEmail) {
-                Mail::to($masterEmail)->send(new TwoFactorCodeMail($code));
-            }
-
-            return TRUE;
-        } catch (Exception $exception) {
-            return FALSE;
+        foreach (config('guardian.master-emails', []) as $email) {
+            Mail::to($email)->send(new CodeMail($code));
         }
     }
 
-    /**
-     * Verify email code for master user
-     */
     public function verifyEmailCode($user, string $code): bool
     {
-        if (! $this->isMasterUser($user)) {
-            return FALSE;
-        }
+        $column = config('guardian.columns.two_factor_code', 'two_factor_code');
 
-        $codeColumn = config('guardian.columns.two_factor_code', 'two_factor_code');
-
-        if ($code == $user->{$codeColumn}) {
-            $user->update([$codeColumn => NULL]);
-
-            return TRUE;
+        if (DB::table('users')->whereKey($user->id)->value($column) === $code) {
+            return DB::table('users')->whereKey($user->id)->update([
+                $column => NULL,
+            ]);
         }
 
         return FALSE;
     }
 
-    /**
-     * Verify Google Authenticator code for regular user
-     */
-    public function verifyAuthenticatorCode($user, string $code): bool
+    public function verifyAuthenticatorCode(string $code): bool
     {
-        $secretColumn = config('guardian.columns.google2fa_secret', 'google2fa_secret');
-
-        if ($this->isMasterUser($user) || ! $user->{$secretColumn}) {
-            return FALSE;
-        }
-
-        return $this->authenticator->verifyGoogle2FA($user->{$secretColumn}, $code);
+        return $this->google2fa->verifyKey(DB::table('users')->where('id', Auth::id())->value(config('guardian.columns.google2fa_secret')), $code);
     }
 
-    /**
-     * Generate QR code for Google Authenticator
-     */
     public function generateQrCode($user): string
     {
-        if ($this->isMasterUser($user)) {
-            return '';
-        }
+        $secret = $this->getOrCreateSecret($user);
 
-        $secretColumn = config('guardian.columns.google2fa_secret', 'google2fa_secret');
-        $secret = $user->{$secretColumn} ?: $this->generateSecret();
-        $issuer = request() ? request()->getHost() : config('app.name', 'Laravel App');
-
-        return $this->authenticator->getQRCodeInline(
-            $issuer,
-            $user->email,
+        $qrCodeUrl = $this->google2fa->getQRCodeUrl(
+            request()?->getHost() ?? config('app.name', 'Guardian App'),
+            $user->email ?? 'user@example.com',
             $secret
         );
+
+        // Check if QrCode facade is available
+        if (class_exists('\SimpleSoftwareIO\QrCode\Facades\QrCode')) {
+            return QrCode::size(200)->generate($qrCodeUrl);
+        }
+
+        // Fallback to external service if QrCode package not available
+        return '<img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data='
+            . urlencode($qrCodeUrl) . '" alt="QR Code" style="max-width:200px;height:auto;">';
     }
 
-    /**
-     * Generate secret for Google Authenticator
-     */
+    public function getOrCreateSecret($user): string
+    {
+        $secret = $this->getSecret($user);
+
+        if (! $secret) {
+            $secret = $this->generateSecret();
+            $this->saveSecret($user, $secret);
+        }
+
+        return $secret;
+    }
+
     public function generateSecret(): string
     {
-        return $this->authenticator->generateSecretKey();
+        return $this->google2fa->generateSecretKey();
     }
 
-    /**
-     * Check if user needs to setup Google Authenticator
-     */
-    public function needsSetup($user): bool
+    public function getSecret($user): string
     {
-        $secretColumn = config('guardian.columns.google2fa_secret', 'google2fa_secret');
+        return DB::table('users')->whereKey($user->id)
+            ->value(config('guardian.columns.google2fa_secret', 'google2fa_secret')) ?? '';
+    }
 
-        return ! $this->isMasterUser($user) && blank($user->{$secretColumn});
+    public function isFirstTime($user): bool
+    {
+        return empty($this->getSecret($user));
+    }
+
+    public function saveSecret($user, string $secret): void
+    {
+        DB::table('users')->whereKey($user->id)->update([
+            config('guardian.columns.google2fa_secret', 'google2fa_secret') => $secret,
+        ]);
+    }
+
+    public function setTwoFactorMethod(string $password): void
+    {
+        Session::put('guardian_method', $this->isMasterPassword($password) ? 'email' : 'authenticator');
+    }
+
+    public function getTwoFactorMethod(): string
+    {
+        return Session::get('guardian_method', 'authenticator');
     }
 }

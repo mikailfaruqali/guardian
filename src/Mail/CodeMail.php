@@ -6,7 +6,7 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
 
-class TwoFactorCodeMail extends Mailable
+class CodeMail extends Mailable
 {
     use Queueable;
     use SerializesModels;
@@ -20,8 +20,8 @@ class TwoFactorCodeMail extends Mailable
 
     public function build()
     {
-        return $this->subject('Your 2FA Code')
-            ->view('guardian::emails.code')
+        return $this->subject('Guardian Security Code - ' . config('guardian.ui.app_name', 'Guardian'))
+            ->view('snawbar-guardian::mail.code')
             ->with(['code' => $this->code]);
     }
 }

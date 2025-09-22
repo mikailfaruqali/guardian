@@ -12,8 +12,4 @@ Route::middleware(['web', 'auth'])->prefix('guardian')->name('guardian.')->group
     // Google Authenticator routes (for regular users)
     Route::get('/authenticator', [GuardianController::class, 'showAuthenticator'])->name('authenticator');
     Route::post('/authenticator/verify', [GuardianController::class, 'verifyAuthenticator'])->name('authenticator.verify');
-
-    // Setup routes
-    Route::get('/setup', [GuardianController::class, 'showSetup'])->name('setup');
-    Route::post('/setup', [GuardianController::class, 'completeSetup'])->name('setup.complete');
 });
