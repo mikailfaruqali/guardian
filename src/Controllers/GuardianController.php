@@ -19,17 +19,8 @@ class GuardianController extends Controller
 
     public function showEmail()
     {
-        if ($this->guardian->getTwoFactorMethod() !== 'email') {
-            return redirect()->route('guardian.authenticator');
-        }
-
-        $user = Auth::user();
-        $codeColumn = config('guardian.columns.two_factor_code', 'two_factor_code');
-
-        // Auto-send code on first visit if not already sent
-        $hasCode = DB::table('users')->where('id', $user->id)->value($codeColumn);
-        if (! $hasCode) {
-            $this->guardian->sendEmailCode($user);
+        if (blank(DB::table('users')->where('id', Auth::id())->value($this->col('two_factor_code')))) {
+            $this->guardian->sendEmailCode();
         }
 
         return view('snawbar-guardian::email');
@@ -37,68 +28,59 @@ class GuardianController extends Controller
 
     public function sendEmail()
     {
-        $user = Auth::user();
-
-        if ($this->guardian->sendEmailCode($user)) {
-            return back()->with('success', 'Code sent to email!');
-        }
-
-        return back()->with('error', 'Failed to send code');
+        return $this->guardian->sendEmailCode();
     }
 
     public function verifyEmail(Request $request)
     {
-        $request->validate(['code' => 'required|string|size:6']);
+        $request->validate([
+            'code' => 'required|string|size:6',
+        ]);
 
-        $user = Auth::user();
-
-        if ($this->guardian->verifyEmailCode($user, $request->code)) {
+        if ($this->guardian->verifyEmailCode($request->code)) {
             $this->guardian->markAsVerified();
 
             return redirect()->intended('/');
         }
 
-        return back()->with('error', 'Invalid verification code!');
+        return back();
     }
 
-    // Google Authenticator (when regular password used)
     public function showAuthenticator()
     {
-        if ($this->guardian->getTwoFactorMethod() === 'email') {
-            return redirect()->route('guardian.email');
-        }
-
-        $user = Auth::user();
-        $isFirstTime = $this->guardian->isFirstTime($user);
-
-        // First time - generate and show QR code setup
-        if ($isFirstTime) {
-            $secret = $this->guardian->getOrCreateSecret($user);
-            $qrCode = $this->guardian->generateQrCode($user);
-
+        if ($this->guardian->isFirstTime()) {
             return view('snawbar-guardian::authenticator', [
-                'qrCode' => $qrCode,
-                'secret' => $secret,
+                'qrCode' => $this->guardian->getOrCreateSecret(),
+                'secret' => $this->guardian->generateQrCode(),
                 'isFirstTime' => TRUE,
             ]);
         }
 
-        // Returning user - just show input
         return view('snawbar-guardian::authenticator');
     }
 
     public function verifyAuthenticator(Request $request)
     {
-        $request->validate(['code' => 'required|string|size:6']);
+        $request->validate([
+            'code' => 'required|string|size:6',
+        ]);
 
-        $user = Auth::user();
-
-        if ($this->guardian->verifyAuthenticatorCode($user, $request->code)) {
+        if ($this->guardian->verifyAuthenticatorCode($request->code)) {
             $this->guardian->markAsVerified();
 
             return redirect()->intended('/');
         }
 
-        return back()->with('error', 'Invalid verification code!');
+        return back();
+    }
+
+    private function config(string $key): mixed
+    {
+        return config(sprintf('snawbar-guardian.%s', $key));
+    }
+
+    private function col(string $key): string
+    {
+        return $this->config(sprintf('columns.%s', $key));
     }
 }
