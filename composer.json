@@ -1,0 +1,46 @@
+{
+    "name": "mikailfaruqali/localization",
+    "description": "A comprehensive Laravel package that provides an intuitive web interface for managing translation files and overrides. Features a modern Bootstrap 5 UI with advanced tools for comparing, editing, and synchronizing language files across multiple locales.",
+    "keywords": [
+        "laravel",
+        "localization",
+        "translations",
+        "i18n",
+        "language"
+    ],
+    "homepage": "https://github.com/mikailfaruqali/localization",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Snawbar",
+            "email": "alanfaruq85@gmail.com",
+            "role": "Developer"
+        }
+    ],
+    "require": {
+        "php": "^8.0",
+        "illuminate/contracts": ">=5.0"
+    },
+    "require-dev": {
+        "laravel/pint": "^1.14",
+        "orchestra/testbench": "^9.0.0 || ^8.22.0",
+        "driftingly/rector-laravel": "^2.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Snawbar\\Localization\\": "src/"
+        },
+        "files": [
+            "src/helpers.php"
+        ]
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Snawbar\\Localization\\LocalizationServiceProvider"
+            ]
+        }
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true
+}
