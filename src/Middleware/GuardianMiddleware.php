@@ -14,7 +14,7 @@ class GuardianMiddleware
         $guardian = app('guardian');
 
         // Skip if no user or 2FA disabled
-        if (!$user || !$guardian->isEnabled()) {
+        if (! $user || ! $guardian->isEnabled()) {
             return $next($request);
         }
 
@@ -30,12 +30,13 @@ class GuardianMiddleware
 
         // Redirect to appropriate 2FA page
         if ($guardian->isMasterUser($user)) {
-            return redirect()->route('guardian.email');
-        } else {
-            if ($guardian->needsSetup($user)) {
-                return redirect()->route('guardian.setup');
-            }
-            return redirect()->route('guardian.authenticator');
+            return to_route('guardian.email');
         }
+
+        if ($guardian->needsSetup($user)) {
+            return to_route('guardian.setup');
+        }
+
+        return to_route('guardian.authenticator');
     }
 }

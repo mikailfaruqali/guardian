@@ -10,9 +10,7 @@ class GuardianServiceProvider extends ServiceProvider
 {
     public function register()
     {
-        $this->app->singleton('guardian', function () {
-            return new Guardian();
-        });
+        $this->app->singleton('guardian', fn () => new Guardian);
     }
 
     public function boot()

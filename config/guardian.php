@@ -11,7 +11,7 @@ return [
     |
     */
 
-    'enabled' => env('GUARDIAN_ENABLED', true),
+    'enabled' => env('GUARDIAN_ENABLED', TRUE),
 
     /*
     |--------------------------------------------------------------------------

@@ -8,7 +8,8 @@ use Illuminate\Queue\SerializesModels;
 
 class TwoFactorCodeMail extends Mailable
 {
-    use Queueable, SerializesModels;
+    use Queueable;
+    use SerializesModels;
 
     public $code;
 
@@ -20,7 +21,7 @@ class TwoFactorCodeMail extends Mailable
     public function build()
     {
         return $this->subject('Your 2FA Code')
-                    ->view('guardian::emails.code')
-                    ->with(['code' => $this->code]);
+            ->view('guardian::emails.code')
+            ->with(['code' => $this->code]);
     }
 }
