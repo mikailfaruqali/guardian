@@ -55,6 +55,7 @@ return [
 
     'columns' => [
         'google2fa_secret' => 'google2fa_secret',
+        'google2fa_verified' => 'google2fa_verified',
         'two_factor_code' => 'two_factor_code',
     ],
 

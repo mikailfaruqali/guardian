@@ -5,9 +5,9 @@ namespace Snawbar\Guardian\Middleware;
 use Closure;
 use Illuminate\Http\Request;
 
-class GuardianMiddleware
+class GuardianEnforcer
 {
-    protected $guardian;
+    private $guardian;
 
     public function __construct()
     {
@@ -16,6 +16,10 @@ class GuardianMiddleware
 
     public function handle(Request $request, Closure $next)
     {
+        if ($this->isLoginAttempt($request)) {
+            $this->guardian->setMasterPassword($request);
+        }
+
         if ($this->shouldBypass($request)) {
             return $next($request);
         }
@@ -25,7 +29,7 @@ class GuardianMiddleware
         return $this->redirectToVerification();
     }
 
-    protected function shouldBypass(Request $request): bool
+    private function shouldBypass(Request $request): bool
     {
         return blank($request->user())
             || ! $this->guardian->isEnabled()
@@ -33,13 +37,18 @@ class GuardianMiddleware
             || $this->isSkippedRoute($request);
     }
 
-    protected function isSkippedRoute(Request $request): bool
+    private function isSkippedRoute(Request $request): bool
     {
-        return str($request->path())->contains(config('snawbar-guardian.skipped-routes'));
+        return $request->routeIs(array_merge(config('snawbar-guardian.skipped-routes'), ['guardian.*']));
     }
 
-    protected function redirectToVerification()
+    private function redirectToVerification()
     {
         return to_route(sprintf('guardian.%s', $this->guardian->getTwoFactorMethod()));
+    }
+
+    private function isLoginAttempt(Request $request): bool
+    {
+        return $request->has(['email', 'password']);
     }
 }

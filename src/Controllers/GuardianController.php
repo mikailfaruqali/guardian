@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\DB;
 
 class GuardianController extends Controller
 {
-    protected $guardian;
+    private $guardian;
 
     public function __construct()
     {
@@ -40,9 +40,7 @@ class GuardianController extends Controller
         ]);
 
         if ($this->guardian->verifyEmailCode($request->code)) {
-            $this->guardian->markAsVerified();
-
-            return redirect()->intended('/');
+            return $this->guardian->markAsVerified();
         }
 
         return back();
@@ -50,15 +48,17 @@ class GuardianController extends Controller
 
     public function showAuthenticator()
     {
-        if ($this->guardian->isFirstTime()) {
+        if ($this->guardian->hasEverVerified()) {
             return view('snawbar-guardian::authenticator', [
-                'qrCode' => $this->guardian->getOrCreateSecret(),
-                'secret' => $this->guardian->generateQrCode(),
-                'isFirstTime' => TRUE,
+                'isFirstTime' => FALSE,
             ]);
         }
 
-        return view('snawbar-guardian::authenticator');
+        return view('snawbar-guardian::authenticator', [
+            'qrCode' => $this->guardian->generateQrCode(),
+            'secret' => $this->guardian->getOrCreateSecret(),
+            'isFirstTime' => TRUE,
+        ]);
     }
 
     public function verifyAuthenticator(Request $request)
@@ -68,9 +68,7 @@ class GuardianController extends Controller
         ]);
 
         if ($this->guardian->verifyAuthenticatorCode($request->code)) {
-            $this->guardian->markAsVerified();
-
-            return redirect()->intended('/');
+            return $this->guardian->markAsVerified();
         }
 
         return back();

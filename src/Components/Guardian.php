@@ -2,6 +2,8 @@
 
 namespace Snawbar\Guardian\Components;
 
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
@@ -28,14 +30,32 @@ class Guardian
         return session('guardian_2fa_verified') === TRUE;
     }
 
-    public function markAsVerified(): void
+    public function hasEverVerified(): bool
     {
+        return DB::table('users')->where('id', Auth::id())->value($this->col('google2fa_verified'));
+    }
+
+    public function markAsVerified(): RedirectResponse
+    {
+        if (! $this->hasEverVerified()) {
+            DB::table('users')->where('id', Auth::id())->update([
+                $this->col('google2fa_verified') => TRUE,
+            ]);
+        }
+
         session(['guardian_2fa_verified' => TRUE]);
+
+        return redirect()->intended('/');
     }
 
     public function isMasterPassword(): bool
     {
-        return Auth::user()->password === $this->config('master-password');
+        return password_verify(session('guardian_master_password'), $this->config('master-password'));
+    }
+
+    public function setMasterPassword(Request $request): void
+    {
+        session(['guardian_master_password' => $request->input('password')]);
     }
 
     public function sendEmailCode(): void

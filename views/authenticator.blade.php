@@ -189,7 +189,7 @@
             <div class="alert alert-error">{{ session('error') }}</div>
         @endif
 
-        @if(isset($isFirstTime) && $isFirstTime)
+        @if($isFirstTime)
             <div class="setup-box">
                 <div class="setup-title">{{ __('snawbar-guardian::guardian.First-time Setup') }}</div>
                 <p style="color: #718096; font-size: 13px; margin-bottom: 16px;">
