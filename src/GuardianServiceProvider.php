@@ -17,6 +17,7 @@ class GuardianServiceProvider extends ServiceProvider
     {
         $this->registerRoutes();
         $this->registerViews();
+        $this->registerTranslations();
         $this->publishConfig();
         $this->prependMiddlewareToWebGroup();
     }
@@ -36,14 +37,25 @@ class GuardianServiceProvider extends ServiceProvider
         $this->loadViewsFrom(__DIR__ . '/../views', 'snawbar-guardian');
     }
 
+    private function registerTranslations(): void
+    {
+        $this->loadTranslationsFrom(__DIR__ . '/../lang', 'snawbar-guardian');
+    }
+
     private function publishConfig(): void
     {
         if ($this->app->runningInConsole()) {
             $this->publishes([
-                __DIR__ . '/../config/guardian.php' => config_path('snawbar-guardian.php'),
+                __DIR__ . '/../config/guardian.php' => config_path('guardian.php'),
+            ], 'snawbar-guardian-config');
+
+            $this->publishes([
                 __DIR__ . '/../views' => resource_path('views/vendor/snawbar-guardian'),
-                __DIR__ . '/../lang' => lang_path('snawbar-guardian'),
-            ], 'snawbar-guardians');
+            ], 'snawbar-guardian-views');
+
+            $this->publishes([
+                __DIR__ . '/../lang' => lang_path('vendor/snawbar-guardian'),
+            ], 'snawbar-guardian-lang');
         }
     }
 

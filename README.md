@@ -42,15 +42,20 @@ composer require pragmarx/google2fa
 
 3. Publish the configuration:
 ```bash
-php artisan vendor:publish --tag=guardian-config
+php artisan vendor:publish --tag=snawbar-guardian-config
 ```
 
 4. Publish language files (optional):
 ```bash
-php artisan vendor:publish --tag=guardian-lang
+php artisan vendor:publish --tag=snawbar-guardian-lang
 ```
 
-5. Add required columns to your users table:
+5. Publish views for customization (optional):
+```bash
+php artisan vendor:publish --tag=snawbar-guardian-views
+```
+
+6. Add required columns to your users table:
 ```php
 Schema::table('users', function (Blueprint $table) {
     $table->string('google2fa_secret')->nullable();
