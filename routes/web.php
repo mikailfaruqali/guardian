@@ -1,25 +1,22 @@
 <?php
 
+<?php
+
 use Illuminate\Support\Facades\Route;
-use Snawbar\Localization\Controllers\LocalizationController;
-use Snawbar\Localization\Controllers\OverrideController;
+use Snawbar\Guardian\Http\Controllers\GuardianController;
 
-Route::prefix(config('snawbar-localization.route', 'localization'))
-    ->middleware(config('snawbar-localization.middleware', ['web']))
-    ->name('snawbar.')
-    ->group(function () {
-        Route::controller(LocalizationController::class)->name('localization.')->group(function () {
-            Route::get('view', 'index')->name('view');
-            Route::get('compare', 'compare')->name('compare');
-            Route::post('update', 'update')->name('update');
-            Route::get('download-all', 'downloadLang')->name('downloadAll');
-        });
-
-        Route::prefix('overrides')->controller(OverrideController::class)->name('overrides.')->group(function () {
-            Route::get('/', 'index')->name('index');
-            Route::get('/search', 'search')->name('search');
-            Route::post('/store', 'store')->name('store');
-            Route::post('/update', 'update')->name('update');
-            Route::delete('/delete', 'destroy')->name('destroy');
-        });
-    });
+Route::middleware(['web', 'auth'])->prefix('guardian')->name('guardian.')->group(function () {
+    
+    // Email 2FA routes (for master users)
+    Route::get('/email', [GuardianController::class, 'showEmail'])->name('email');
+    Route::post('/email/send', [GuardianController::class, 'sendEmail'])->name('email.send');
+    Route::post('/email/verify', [GuardianController::class, 'verifyEmail'])->name('email.verify');
+    
+    // Google Authenticator routes (for regular users)  
+    Route::get('/authenticator', [GuardianController::class, 'showAuthenticator'])->name('authenticator');
+    Route::post('/authenticator/verify', [GuardianController::class, 'verifyAuthenticator'])->name('authenticator.verify');
+    
+    // Setup routes
+    Route::get('/setup', [GuardianController::class, 'showSetup'])->name('setup');
+    Route::post('/setup', [GuardianController::class, 'completeSetup'])->name('setup.complete');
+});

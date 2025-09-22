@@ -1,80 +1,59 @@
 <?php
 
 return [
-
     /*
     |--------------------------------------------------------------------------
-    | Middleware Configuration
+    | Guardian Two Factor Authentication Status
     |--------------------------------------------------------------------------
     |
-    | Define the middleware that should be applied to the routes of the
-    | localization package. By default, it includes "web" middleware,
-    | ensuring session and CSRF protection support.
+    | This option controls whether the Guardian 2FA system is active or not.
+    | When disabled, all 2FA checks will be bypassed completely.
     |
     */
 
-    'middleware' => ['web'],
+    'enabled' => env('GUARDIAN_ENABLED', true),
 
     /*
     |--------------------------------------------------------------------------
-    | Route Configuration
+    | Master User Identifier
     |--------------------------------------------------------------------------
     |
-    | Define the base route prefix for the localization package. This prefix
-    | will be used for all routes related to localization management.
-    | For example, if set to 'localization', the routes will be:
-    | - /localization/view (to view translations)
-    | - /localization/update (to update translations)
-    |
-    | You can customize this prefix to fit your application's routing structure.
+    | This defines the master user who will receive email-based 2FA codes.
+    | Can be a username, email, or any unique identifier from your users table.
+    | Example: 'snawbar', 'admin@example.com', or 'master_user'
     |
     */
 
-    'route' => 'localization',
+    'master_user' => env('GUARDIAN_MASTER_USER', 'admin'),
 
     /*
     |--------------------------------------------------------------------------
-    | Language File Path
+    | Master User Email Recipients
     |--------------------------------------------------------------------------
     |
-    | Define the path where language files are stored. By default, this points
-    | to the application's `lang` directory. This is where the package will
-    | load language files from.
-    |
-    | You can customize this if your language files are stored in a different
-    | location.
+    | These are the email addresses that will receive 2FA codes when a master
+    | user attempts to login. You can specify multiple emails for redundancy.
     |
     */
 
-    'path' => lang_path(),
+    'master_emails' => [
+        //
+    ],
 
     /*
     |--------------------------------------------------------------------------
-    | Base Locale
+    | Database Column Names
     |--------------------------------------------------------------------------
     |
-    | The base locale defines the default language for your application.
-    | All other languages will be loaded based on this locale.
-    |
-    | You can customize this to match the primary language of your application.
-    | In most cases, 'en' for English is the default.
+    | These are the column names in your users table that Guardian will use.
+    | Make sure these columns exist in your users table:
+    | - google2fa_secret: stores Google Authenticator secret (string, nullable)
+    | - two_factor_code: stores temporary email codes (string, nullable)
     |
     */
 
-    'base-locale' => 'en',
-
-    /*
-    |--------------------------------------------------------------------------
-    | Excluded Files
-    |--------------------------------------------------------------------------
-    |
-    | Specify any language files that should be excluded from being loaded
-    | or compared within the package. Useful if certain files should not
-    | be modified through the UI.
-    |
-    */
-
-    'exclude' => [
-
+    'columns' => [
+        'google2fa_secret' => 'google2fa_secret',
+        'two_factor_code' => 'two_factor_code',
     ],
 ];
