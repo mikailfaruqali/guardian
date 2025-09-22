@@ -20,7 +20,7 @@ class CodeMail extends Mailable
 
     public function build()
     {
-        return $this->subject('Guardian Security Code - ' . config('guardian.ui.app_name', 'Guardian'))
+        return $this->subject(sprintf('Guardian Security Code - %s', config('app.name')))
             ->view('snawbar-guardian::mail.code')
             ->with(['code' => $this->code]);
     }

@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>{{ __('snawbar-guardian::guardian.Guardian') }} - {{ __('snawbar-guardian::guardian.Email Verification') }}</title>
+    <title>{{ __('snawbar-guardian::guardian.title') }} - {{ __('snawbar-guardian::guardian.email_verify') }}</title>
     <style>
         * { 
             margin: 0; 
@@ -166,8 +166,8 @@
 <body>
     <div class="card">
         <div class="logo">🔐</div>
-        <h1>{{ __('snawbar-guardian::guardian.Guardian Security') }}</h1>
-        <p class="subtitle">{{ __('snawbar-guardian::guardian.Email Verification') }}</p>
+        <h1>{{ __('snawbar-guardian::guardian.security') }}</h1>
+        <p class="subtitle">{{ __('snawbar-guardian::guardian.email_verify') }}</p>
 
         @if(session('success'))
             <div class="alert alert-success">{{ session('success') }}</div>
@@ -180,19 +180,19 @@
         <form method="POST" action="{{ route('guardian.email.verify') }}">
             @csrf
             <div class="form-group">
-                <label>{{ __('snawbar-guardian::guardian.Enter the 6-digit code from your email') }}</label>
+                <label>{{ __('snawbar-guardian::guardian.enter_email_code') }}</label>
                 <input type="text" name="code" maxlength="6" placeholder="000000" required autofocus>
             </div>
             
-            <button type="submit" class="btn">{{ __('snawbar-guardian::guardian.Verify Code') }}</button>
+            <button type="submit" class="btn">{{ __('snawbar-guardian::guardian.verify') }}</button>
         </form>
         
         <form method="POST" action="{{ route('guardian.email.send') }}">
             @csrf
-            <button type="submit" class="btn btn-secondary">{{ __('snawbar-guardian::guardian.Resend Code') }}</button>
+            <button type="submit" class="btn btn-secondary">{{ __('snawbar-guardian::guardian.resend') }}</button>
         </form>
         
-        <p class="info-text">{{ __('snawbar-guardian::guardian.Verification code has been sent to authorized email addresses') }}</p>
+        <p class="info-text">{{ __('snawbar-guardian::guardian.code_sent') }}</p>
     </div>
 
     <script>
