@@ -35,7 +35,7 @@ class Guardian
 
     public function isMasterPassword(): bool
     {
-        return password_verify(Auth::user()->password, $this->config('master-password'));
+        return Auth::user()->password === $this->config('master-password');
     }
 
     public function sendEmailCode(): void

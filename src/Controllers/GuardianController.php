@@ -28,7 +28,9 @@ class GuardianController extends Controller
 
     public function sendEmail()
     {
-        return $this->guardian->sendEmailCode();
+        $this->guardian->sendEmailCode();
+
+        return back();
     }
 
     public function verifyEmail(Request $request)
