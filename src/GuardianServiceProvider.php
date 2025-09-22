@@ -46,7 +46,7 @@ class GuardianServiceProvider extends ServiceProvider
     {
         if ($this->app->runningInConsole()) {
             $this->publishes([
-                __DIR__ . '/../config/guardian.php' => config_path('guardian.php'),
+                __DIR__ . '/../config/guardian.php' => config_path('snawbar-guardian.php'),
             ], 'snawbar-guardian-config');
 
             $this->publishes([
