@@ -2,26 +2,31 @@
 
 namespace Snawbar\Guardian\Mail;
 
-use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
-use Illuminate\Queue\SerializesModels;
 
 class CodeMail extends Mailable
 {
-    use Queueable;
-    use SerializesModels;
+    public string $code;
 
-    public $code;
-
-    public function __construct($code)
+    public function __construct(string $code)
     {
         $this->code = $code;
     }
 
-    public function build()
+    public function build(): self
     {
-        return $this->subject(sprintf('Guardian Security Code - %s', config('app.name')))
+        return $this->subject($this->getSubject())
             ->view('snawbar-guardian::mail.code')
             ->with(['code' => $this->code]);
+    }
+
+    private function getSubject(): string
+    {
+        return sprintf('Guardian Security Code - %s', $this->getAppName());
+    }
+
+    private function getAppName(): string
+    {
+        return config('app.name', 'Application');
     }
 }

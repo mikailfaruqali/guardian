@@ -2,6 +2,7 @@
 
 namespace Snawbar\Guardian;
 
+use Illuminate\Routing\Router;
 use Illuminate\Support\ServiceProvider;
 use Snawbar\Guardian\Components\Guardian;
 use Snawbar\Guardian\Middleware\GuardianEnforcer;
@@ -19,7 +20,7 @@ class GuardianServiceProvider extends ServiceProvider
         $this->registerViews();
         $this->registerTranslations();
         $this->publishConfig();
-        $this->registerMiddlewares();
+        $this->registerMiddleware();
     }
 
     private function registerGuardianSingleton(): void
@@ -59,8 +60,8 @@ class GuardianServiceProvider extends ServiceProvider
         }
     }
 
-    private function registerMiddlewares(): void
+    private function registerMiddleware(): void
     {
-        $this->app['router']->prependMiddlewareToGroup('web', GuardianEnforcer::class);
+        app(Router::class)->prependMiddlewareToGroup('web', GuardianEnforcer::class);
     }
 }

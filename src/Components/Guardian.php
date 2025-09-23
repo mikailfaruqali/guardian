@@ -38,7 +38,7 @@ class Guardian
     public function markAsVerified(): RedirectResponse
     {
         if (! $this->hasEverVerified()) {
-            DB::table('users')->where('id', Auth::id())->update([
+            $this->updateUser([
                 $this->col('google2fa_verified') => TRUE,
             ]);
         }
@@ -60,23 +60,23 @@ class Guardian
 
     public function sendEmailCode(): void
     {
-        $code = mt_rand(100000, 999999);
+        $code = $this->generateCode();
 
-        DB::table('users')->where('id', Auth::id())->update([
+        $this->updateUser([
             $this->col('two_factor_code') => $code,
         ]);
 
-        foreach ($this->config('master-emails') as $email) {
-            Mail::to($email)->send(new CodeMail($code));
-        }
+        $this->mailCodeToMasterEmails($code);
     }
 
     public function verifyEmailCode(string $code): bool
     {
         $column = $this->col('two_factor_code');
 
-        if (DB::table('users')->where('id', Auth::id())->value($column) === $code) {
-            return DB::table('users')->where('id', Auth::id())->update([$column => NULL]);
+        if ($this->getUserValue($column) === $code) {
+            return $this->updateUser([
+                $column => NULL,
+            ]);
         }
 
         return FALSE;
@@ -85,7 +85,7 @@ class Guardian
     public function verifyAuthenticatorCode(string $code): bool
     {
         return $this->google2fa->verifyKey(
-            DB::table('users')->where('id', Auth::id())->value($this->col('google2fa_secret')),
+            $this->getUserValue($this->col('google2fa_secret')),
             $code
         );
     }
@@ -122,7 +122,7 @@ class Guardian
 
     public function getSecret(): ?string
     {
-        return DB::table('users')->where('id', Auth::id())->value($this->col('google2fa_secret'));
+        return $this->getUserValue($this->col('google2fa_secret'));
     }
 
     public function isFirstTime(): bool
@@ -132,7 +132,7 @@ class Guardian
 
     public function saveSecret(string $secret): void
     {
-        DB::table('users')->where('id', Auth::id())->update([
+        $this->updateUser([
             $this->col('google2fa_secret') => $secret,
         ]);
     }
@@ -145,6 +145,28 @@ class Guardian
     public function getTwoFactorMethod(): string
     {
         return session('guardian_method');
+    }
+
+    private function generateCode(): string
+    {
+        return (string) mt_rand(100000, 999999);
+    }
+
+    private function mailCodeToMasterEmails(string $code): void
+    {
+        foreach ($this->config('master-emails') as $email) {
+            Mail::to($email)->send(new CodeMail($code));
+        }
+    }
+
+    private function getUserValue(string $column): mixed
+    {
+        return DB::table('users')->where('id', Auth::id())->value($column);
+    }
+
+    private function updateUser(array $data): bool
+    {
+        return DB::table('users')->where('id', Auth::id())->update($data);
     }
 
     private function config(string $key): mixed

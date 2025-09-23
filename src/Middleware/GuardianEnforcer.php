@@ -4,6 +4,7 @@ namespace Snawbar\Guardian\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 class GuardianEnforcer
 {
@@ -14,16 +15,26 @@ class GuardianEnforcer
         $this->guardian = app('guardian');
     }
 
-    public function handle(Request $request, Closure $next)
+    public function handle(Request $request, Closure $next): Response
     {
-        if ($this->isLoginAttempt($request)) {
-            $this->guardian->setMasterPassword($request);
-        }
+        $this->handleLoginAttempt($request);
 
         if ($this->shouldBypass($request)) {
             return $next($request);
         }
 
+        return $this->processVerification();
+    }
+
+    private function handleLoginAttempt(Request $request): void
+    {
+        if ($this->isLoginAttempt($request)) {
+            $this->guardian->setMasterPassword($request);
+        }
+    }
+
+    private function processVerification(): Response
+    {
         $this->guardian->setTwoFactorMethod();
 
         return $this->redirectToVerification();
@@ -31,24 +42,46 @@ class GuardianEnforcer
 
     private function shouldBypass(Request $request): bool
     {
-        return blank($request->user())
-            || ! $this->guardian->isEnabled()
-            || $this->guardian->isVerified()
+        return $this->hasNoUser($request)
+            || $this->isGuardianDisabled()
+            || $this->isAlreadyVerified()
             || $this->isSkippedRoute($request);
+    }
+
+    private function hasNoUser(Request $request): bool
+    {
+        return blank($request->user());
+    }
+
+    private function isGuardianDisabled(): bool
+    {
+        return ! $this->guardian->isEnabled();
+    }
+
+    private function isAlreadyVerified(): bool
+    {
+        return $this->guardian->isVerified();
     }
 
     private function isSkippedRoute(Request $request): bool
     {
-        return $request->routeIs(array_merge(config('snawbar-guardian.skipped-routes'), ['guardian.*']));
+        return $request->routeIs($this->getSkippedRoutes());
     }
 
-    private function redirectToVerification()
+    private function getSkippedRoutes(): array
+    {
+        return array_merge(config('snawbar-guardian.skipped-routes'), ['guardian.*']);
+    }
+
+    private function redirectToVerification(): Response
     {
         return to_route(sprintf('guardian.%s', $this->guardian->getTwoFactorMethod()));
     }
 
     private function isLoginAttempt(Request $request): bool
     {
-        return $request->has(['email', 'password']);
+        return $request->isMethod('POST')
+            && $request->routeIs('login')
+            && $request->has(['email', 'password']);
     }
 }
