@@ -2,6 +2,7 @@
 
 return [
     'login' => 'Login',
+    'logout' => 'Logout',
     'resend' => 'Resend Code',
     'enter-email-code' => 'Enter the 6-digit code from your email',
     'invalid-code' => 'Sorry, the code is incorrect !',

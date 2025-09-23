@@ -82,9 +82,7 @@ class GuardianEnforcer
 
     private function isLoginAttempt(Request $request): bool
     {
-        return $request->isMethod('POST')
-            && $request->routeIs('login')
-            && $request->has(['email', 'password']);
+        return $request->isMethod('POST') && $request->has(['email', 'password']);
     }
 
     private function setDirection(): void

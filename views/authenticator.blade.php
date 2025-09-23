@@ -64,5 +64,13 @@
             class="w-full h-11 md:h-12 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-2xl transition-all duration-300 transform hover:scale-[1.02] active:scale-[0.98]">
             {{ __('snawbar-guardian::guardian.login') }}
         </button>
+
+        <form method="POST" action="{{ route('logout') }}">
+            @csrf
+            <button type="submit"
+                class="w-full h-11 md:h-12 bg-red-500 hover:bg-red-600 text-white font-medium rounded-2xl border-2 border-dotted border-red-400 transition-all duration-300 transform hover:scale-[1.02] active:scale-[0.98]">
+                {{ __('snawbar-guardian::guardian.logout') }}
+            </button>
+        </form>
     </div>
 @endsection
