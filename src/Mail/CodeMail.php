@@ -3,6 +3,7 @@
 namespace Snawbar\Guardian\Mail;
 
 use Illuminate\Mail\Mailable;
+use Illuminate\Support\Facades\Auth;
 
 class CodeMail extends Mailable
 {
@@ -21,6 +22,7 @@ class CodeMail extends Mailable
                 'subject' => $this->getSubject(),
                 'appName' => $this->getAppName(),
                 'code' => $this->code,
+                'user' => Auth::user(),
             ]);
     }
 
