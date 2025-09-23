@@ -95,9 +95,15 @@ class Guardian
 
     public function verifyAuthenticatorCode(string $code): bool
     {
+        $google2faSecret = $this->getUserValue($this->col('google2fa_secret'));
+
+        if (blank($google2faSecret)) {
+            return FALSE;
+        }
+
         return $this->google2fa->verifyKey(
-            $this->getUserValue($this->col('google2fa_secret')),
-            $code
+            $google2faSecret,
+            $code,
         );
     }
 
@@ -108,7 +114,7 @@ class Guardian
         $qrCodeUrl = $this->google2fa->getQRCodeUrl(
             request()?->getHost(),
             Auth::user()->email,
-            $secret
+            $secret,
         );
 
         return QrCode::size(200)->generate($qrCodeUrl);
