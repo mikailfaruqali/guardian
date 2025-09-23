@@ -1,6 +1,6 @@
 {
     "name": "mikailfaruqali/guardian",
-    "description": "Modern Laravel two-factor authentication package with dual auth system (email-based 2FA for master users, Google Authenticator for regular users), multilingual support (English/Kurdish/Arabic), and beautiful modern UI design",
+    "description": "Modern Laravel two-factor authentication package with dual authentication system: email-based 2FA for master users and Google Authenticator for regular users. Features beautiful Tailwind CSS UI, multilingual support (English/Kurdish/Arabic) with RTL layout, configurable logo/fonts, rate limiting, and seamless Laravel integration.",
     "keywords": [
         "laravel",
         "2fa",

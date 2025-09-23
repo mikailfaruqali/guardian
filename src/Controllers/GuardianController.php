@@ -32,18 +32,18 @@ class GuardianController extends Controller
     {
         $this->guardian->sendEmailCode();
 
-        return back();
+        return back()->with('success', __('snawbar-guardian::guardian.email-sent'));
     }
 
     public function verifyEmail(Request $request): RedirectResponse
     {
-        $this->validateEmailCode($request);
+        $this->validateCode($request);
 
         if ($this->guardian->verifyEmailCode($request->code)) {
             return $this->guardian->markAsVerified();
         }
 
-        return back();
+        return back()->with('error', __('snawbar-guardian::guardian.invalid-code'));
     }
 
     public function showAuthenticator(): View
@@ -57,13 +57,13 @@ class GuardianController extends Controller
 
     public function verifyAuthenticator(Request $request): RedirectResponse
     {
-        $this->validateAuthenticatorCode($request);
+        $this->validateCode($request);
 
         if ($this->guardian->verifyAuthenticatorCode($request->code)) {
             return $this->guardian->markAsVerified();
         }
 
-        return back();
+        return back()->with('error', __('snawbar-guardian::guardian.invalid-code'));
     }
 
     private function shouldSendEmailCode(): bool
@@ -87,17 +87,12 @@ class GuardianController extends Controller
         ]);
     }
 
-    private function validateEmailCode(Request $request): void
+    private function validateCode(Request $request): void
     {
         $request->validate([
             'code' => 'required|string|size:6',
-        ]);
-    }
-
-    private function validateAuthenticatorCode(Request $request): void
-    {
-        $request->validate([
-            'code' => 'required|string|size:6',
+        ], [
+            'code.*' => __('snawbar-guardian::guardian.invalid-code'),
         ]);
     }
 

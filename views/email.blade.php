@@ -1,206 +1,64 @@
-<!DOCTYPE html>
-<html lang="{{ app()->getLocale() }}" dir="{{ app()->isLocale('ku') ? 'rtl' : 'ltr' }}">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>{{ __('snawbar-guardian::guardian.title') }} - {{ __('snawbar-guardian::guardian.email_verify') }}</title>
-    <style>
-        * { 
-            margin: 0; 
-            padding: 0; 
-            box-sizing: border-box; 
-        }
-        
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-            direction: {{ app()->isLocale('ku') ? 'rtl' : 'ltr' }};
-        }
-        
-        .card {
-            background: white;
-            border-radius: 16px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-            width: 100%;
-            max-width: 420px;
-            padding: 40px 30px;
-            text-align: center;
-        }
-        
-        .logo {
-            width: 64px;
-            height: 64px;
-            margin: 0 auto 24px;
-            border-radius: 16px;
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 28px;
-            color: white;
-        }
-        
-        h1 {
-            font-size: 24px;
-            font-weight: 600;
-            color: #1a202c;
-            margin-bottom: 8px;
-        }
-        
-        .subtitle {
-            color: #718096;
-            margin-bottom: 32px;
-            font-size: 14px;
-        }
-        
-        .form-group {
-            margin-bottom: 24px;
-            text-align: left;
-        }
-        
-        label {
-            display: block;
-            font-weight: 500;
-            color: #4a5568;
-            margin-bottom: 8px;
-            font-size: 14px;
-        }
-        
-        input {
-            width: 100%;
-            padding: 16px;
-            border: 2px solid #e2e8f0;
-            border-radius: 12px;
-            font-size: 18px;
-            text-align: center;
-            letter-spacing: 4px;
-            font-weight: 600;
-            transition: all 0.2s;
-            background: #f7fafc;
-        }
-        
-        input:focus {
-            outline: none;
-            border-color: #667eea;
-            background: white;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-        }
-        
-        .btn {
-            width: 100%;
-            padding: 16px;
-            border: none;
-            border-radius: 12px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s;
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            color: white;
-            margin-bottom: 16px;
-        }
-        
-        .btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
-        }
-        
-        .btn-secondary {
-            background: linear-gradient(135deg, #e2e8f0, #cbd5e0);
-            color: #4a5568;
-        }
-        
-        .btn-secondary:hover {
-            box-shadow: 0 8px 25px rgba(203, 213, 224, 0.3);
-        }
-        
-        .alert {
-            padding: 12px 16px;
-            border-radius: 8px;
-            margin-bottom: 16px;
-            font-size: 14px;
-            border-left: 4px solid;
-        }
-        
-        .alert-success {
-            background: #c6f6d5;
-            color: #22543d;
-            border-left-color: #38a169;
-        }
-        
-        .alert-error {
-            background: #fed7d7;
-            color: #c53030;
-            border-left-color: #e53e3e;
-        }
-        
-        .info-text {
-            color: #718096;
-            font-size: 13px;
-            margin-top: 16px;
-            line-height: 1.5;
-        }
-        
-        @media (max-width: 480px) {
-            .card {
-                margin: 10px;
-                padding: 30px 20px;
-            }
-            .logo {
-                width: 56px;
-                height: 56px;
-                font-size: 24px;
-            }
-            h1 {
-                font-size: 20px;
-            }
-        }
-    </style>
-</head>
-<body>
-    <div class="card">
-        <div class="logo">🔐</div>
-        <h1>{{ __('snawbar-guardian::guardian.security') }}</h1>
-        <p class="subtitle">{{ __('snawbar-guardian::guardian.email_verify') }}</p>
+@extends('snawbar-guardian::layout')
 
-        @if(session('success'))
-            <div class="alert alert-success">{{ session('success') }}</div>
-        @endif
-        
-        @if(session('error'))
-            <div class="alert alert-error">{{ session('error') }}</div>
-        @endif
-
-        <form method="POST" action="{{ route('guardian.email.verify') }}">
-            @csrf
-            <div class="form-group">
-                <label>{{ __('snawbar-guardian::guardian.enter_email_code') }}</label>
-                <input type="text" name="code" maxlength="6" placeholder="000000" required autofocus>
+@section('content')
+    @if ($errors->any())
+        @foreach ($errors->all() as $error)
+            <div class="bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-xl mb-4 text-sm">
+                {{ $error }}
             </div>
-            
-            <button type="submit" class="btn">{{ __('snawbar-guardian::guardian.verify') }}</button>
-        </form>
-        
-        <form method="POST" action="{{ route('guardian.email.send') }}">
-            @csrf
-            <button type="submit" class="btn btn-secondary">{{ __('snawbar-guardian::guardian.resend') }}</button>
-        </form>
-        
-        <p class="info-text">{{ __('snawbar-guardian::guardian.code_sent') }}</p>
+        @endforeach
+    @endif
+
+    @if (session('success'))
+        <div class="bg-green-50 border border-green-200 text-green-800 px-4 py-3 rounded-xl mb-4 text-sm">
+            {{ session('success') }}
+        </div>
+    @endif
+
+    @if (session('error'))
+        <div class="bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-xl mb-4 text-sm">
+            {{ session('error') }}
+        </div>
+    @endif
+
+    <div class="w-28 h-28 md:w-32 md:h-32 mx-auto mb-3 md:mb-4 rounded-2xl flex items-center justify-center p-3">
+        @if (config('snawbar-guardian.logo-path'))
+            <img src="{{ asset(config('snawbar-guardian.logo-path')) }}" alt="Logo" class="w-full h-full object-contain">
+        @else
+            <div class="bg-blue-600 rounded-2xl w-full h-full flex items-center justify-center">
+                <svg class="w-16 h-16 md:w-18 md:h-18 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+            </div>
+        @endif
     </div>
 
-    <script>
-        // Auto submit when 6 digits entered
-        document.querySelector('input[name="code"]').addEventListener('input', function(e) {
-            if (e.target.value.length === 6) {
-                setTimeout(() => {
-                    e.target.closest('form').submit();
-                }, 300);
-            }
-        });
+    <p class="text-gray-600 text-sm md:text-base mb-4 md:mb-5 leading-relaxed px-2">
+        {{ __('snawbar-guardian::guardian.enter-email-code') }}
+    </p>
+
+    <div class="mb-3 md:mb-4">
+        <form method="POST" action="{{ route('guardian.email.verify') }}" id="verifyForm">
+            @csrf
+            <input type="text" name="code" maxlength="6" placeholder="000000"
+                class="w-full h-12 md:h-14 text-center text-lg md:text-xl font-bold tracking-[0.3em] md:tracking-[0.5em] border-2 border-dotted border-gray-300 rounded-2xl bg-gray-50/50 focus:bg-white focus:border-blue-400 focus:outline-none transition-all duration-300"
+                autofocus autocomplete="off">
+        </form>
+    </div>
+
+    <div class="space-y-3">
+        <button type="submit" form="verifyForm"
+            class="w-full h-11 md:h-12 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-2xl transition-all duration-300 transform hover:scale-[1.02] active:scale-[0.98]">
+            {{ __('snawbar-guardian::guardian.login') }}
+        </button>
+
+        <form method="POST" action="{{ route('guardian.email.send') }}">
+            @csrf
+            <button type="submit"
+                class="w-full h-11 md:h-12 bg-gray-200 hover:bg-gray-300 text-gray-600 font-medium rounded-2xl border-2 border-dotted border-gray-300 transition-all duration-300 transform hover:scale-[1.02] active:scale-[0.98]">
+                {{ __('snawbar-guardian::guardian.resend') }}
+            </button>
+        </form>
+    </div>
+@endsection

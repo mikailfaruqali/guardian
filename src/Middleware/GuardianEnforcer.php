@@ -23,6 +23,8 @@ class GuardianEnforcer
             return $next($request);
         }
 
+        $this->setDirection();
+
         return $this->processVerification();
     }
 
@@ -83,5 +85,13 @@ class GuardianEnforcer
         return $request->isMethod('POST')
             && $request->routeIs('login')
             && $request->has(['email', 'password']);
+    }
+
+    private function setDirection(): void
+    {
+        session()->put('direction', match (app()->getLocale()) {
+            'ar', 'ku' => 'rtl',
+            default => 'ltr',
+        });
     }
 }
