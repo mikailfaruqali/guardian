@@ -107,5 +107,6 @@ return [
 
     'skipped-routes' => [
         'login',
+        'logout',
     ],
 ];
