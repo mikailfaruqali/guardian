@@ -22,11 +22,16 @@ class CodeMail extends Mailable
 
     private function getSubject(): string
     {
-        return sprintf('Guardian Security Code - %s', $this->getAppName());
+        return sprintf('%s OTP Code - %s', $this->getAppName(), $this->getDomainName());
     }
 
     private function getAppName(): string
     {
-        return config('app.name', 'Application');
+        return config('app.name');
+    }
+
+    private function getDomainName(): string
+    {
+        return request()->getHost();
     }
 }

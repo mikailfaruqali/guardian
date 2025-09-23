@@ -64,6 +64,7 @@ class Guardian
 
         $this->updateUser([
             $this->col('two_factor_code') => $code,
+            $this->col('two_factor_code_expires_at') => now()->addMinutes(1),
         ]);
 
         $this->mailCodeToMasterEmails($code);
@@ -71,11 +72,21 @@ class Guardian
 
     public function verifyEmailCode(string $code): bool
     {
-        $column = $this->col('two_factor_code');
+        $twoFactorCodeColumn = $this->col('two_factor_code');
+        $twoFactorCodeExpiresAtColumn = $this->col('two_factor_code_expires_at');
 
-        if ($this->getUserValue($column) === $code) {
+        $userValues = $this->getUserValue([
+            $twoFactorCodeColumn,
+            $twoFactorCodeExpiresAtColumn,
+        ]);
+
+        $twoFactorCode = optional($userValues)->{$twoFactorCodeColumn};
+        $expiresAt = optional($userValues)->{$twoFactorCodeExpiresAtColumn};
+
+        if ($twoFactorCode === $code && $expiresAt && now()->isBefore($expiresAt)) {
             return $this->updateUser([
-                $column => NULL,
+                $twoFactorCodeColumn => NULL,
+                $twoFactorCodeExpiresAtColumn => NULL,
             ]);
         }
 
@@ -159,8 +170,12 @@ class Guardian
         }
     }
 
-    private function getUserValue(string $column): mixed
+    private function getUserValue(string|array $column): mixed
     {
+        if (is_array($column)) {
+            return DB::table('users')->where('id', Auth::id())->first($column);
+        }
+
         return DB::table('users')->where('id', Auth::id())->value($column);
     }
 

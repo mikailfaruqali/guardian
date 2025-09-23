@@ -46,17 +46,29 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Logo and Font Paths
+    | Logo Configuration
     |--------------------------------------------------------------------------
     |
-    | Custom logo and font paths for Guardian UI customization.
-    | Logo path should be a public URL or asset path relative to public folder.
-    | Font path can be a Google Fonts URL, local font file, or font stack.
-    | Leave empty to use defaults (Guardian icon and system fonts).
+    | Path to your custom logo image file. Supports PNG, SVG, JPG formats.
+    | Path should be relative to the public folder (e.g., '/images/logo.png').
+    | Recommended size: 200x200px or square aspect ratio for best display.
+    | Leave empty to show the default Guardian security icon.
     |
     */
 
     'logo-path' => env('GUARDIAN_LOGO_PATH', ''),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Font Configuration
+    |--------------------------------------------------------------------------
+    |
+    | Path to custom font file for Guardian interface styling.
+    | Supports .woff2, .woff, .ttf formats for @font-face loading.
+    | Use relative path (e.g., '/fonts/Inter-Regular.woff2') for local files.
+    | Leave empty to use system default fonts (Inter, system-ui fallback).
+    |
+    */
 
     'font-path' => env('GUARDIAN_FONT_PATH', ''),
 
@@ -78,6 +90,7 @@ return [
         'google2fa_secret' => 'google2fa_secret',
         'google2fa_verified' => 'google2fa_verified',
         'two_factor_code' => 'two_factor_code',
+        'two_factor_code_expires_at' => 'two_factor_code_expires_at',
     ],
 
     /*
