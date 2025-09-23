@@ -64,7 +64,7 @@ class Guardian
 
         $this->updateUser([
             $this->col('two_factor_code') => $code,
-            $this->col('two_factor_code_expires_at') => now()->addMinutes(1),
+            $this->col('two_factor_code_expires_at') => now()->addMinutes(5),
         ]);
 
         $this->mailCodeToMasterEmails($code);

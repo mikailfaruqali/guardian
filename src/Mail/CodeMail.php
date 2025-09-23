@@ -17,7 +17,11 @@ class CodeMail extends Mailable
     {
         return $this->subject($this->getSubject())
             ->view('snawbar-guardian::mail.code')
-            ->with(['code' => $this->code]);
+            ->with([
+                'subject' => $this->getSubject(),
+                'appName' => $this->getAppName(),
+                'code' => $this->code,
+            ]);
     }
 
     private function getSubject(): string
