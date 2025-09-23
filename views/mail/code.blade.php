@@ -17,9 +17,8 @@
 
     <div style="text-align: center; margin-bottom: 30px;">
         <div style="font-size: 40px; margin-bottom: 20px;">🔐</div>
-        <p style="font-size: 16px; margin-bottom: 10px;">Hello <strong>{{ $user->name }}</strong>!</p>
-        <p style="font-size: 14px; margin-bottom: 20px; color: #666;">{{ $user->email }}</p>
-        <p style="font-size: 16px; margin-bottom: 20px;">You have requested a two-factor authentication code</p>
+        <p style="font-size: 16px; margin-bottom: 20px;">Hello <strong>{{ $user->name }}</strong>
+            ({{ $user->email }}) ! You have requested a two-factor authentication code</p>
 
         <div
             style="background-color: #f8f9fa; border: 2px solid #007bff; border-radius: 8px; padding: 20px; margin: 20px 0; display: inline-block;">
