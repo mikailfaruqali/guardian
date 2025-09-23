@@ -11,16 +11,11 @@
         <style>
             @font-face {
                 font-family: 'CustomFont';
-                src: url('{{ config('snawbar-guardian.font-path') }}') format('woff2'),
-                    url('{{ config('snawbar-guardian.font-path') }}') format('woff'),
-                    url('{{ config('snawbar-guardian.font-path') }}') format('truetype');
-                font-weight: normal;
-                font-style: normal;
-                font-display: swap;
+                src: url('{{ asset(config('snawbar-guardian.font-path')) }}');
             }
 
             * {
-                font-family: 'CustomFont', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif !important;
+                font-family: 'CustomFont' !important;
             }
         </style>
     @endif
