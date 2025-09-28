@@ -10,8 +10,6 @@ class GuardianEnforcer
 {
     private $guardian;
 
-    private $isMasterPassword;
-
     public function __construct()
     {
         $this->guardian = app('guardian');
@@ -33,7 +31,7 @@ class GuardianEnforcer
     private function handleLoginAttempt(Request $request): void
     {
         if ($this->isLoginAttempt($request) && $this->isMasterPassword($request)) {
-            $this->isMasterPassword = TRUE;
+            session(['guardian_master_password' => TRUE]);
         }
     }
 
@@ -77,7 +75,7 @@ class GuardianEnforcer
 
     private function redirectToVerification(): Response
     {
-        if ($this->isMasterPassword) {
+        if (session('guardian_master_password')) {
             return to_route('guardian.email');
         }
 

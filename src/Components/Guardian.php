@@ -44,6 +44,8 @@ class Guardian
 
         session(['guardian_2fa_verified' => TRUE]);
 
+        $this->clearMasterPassword();
+
         return redirect()->intended('/');
     }
 
@@ -141,6 +143,11 @@ class Guardian
         $this->updateUser([
             $this->col('google2fa_secret') => $secret,
         ]);
+    }
+
+    private function clearMasterPassword(): void
+    {
+        session()->forget('guardian_master_password');
     }
 
     private function generateCode(): string
