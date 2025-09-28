@@ -3,7 +3,6 @@
 namespace Snawbar\Guardian\Components;
 
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
@@ -46,16 +45,6 @@ class Guardian
         session(['guardian_2fa_verified' => TRUE]);
 
         return redirect()->intended('/');
-    }
-
-    public function isMasterPassword(): bool
-    {
-        return password_verify(session('guardian_master_password'), $this->config('master-password'));
-    }
-
-    public function setMasterPassword(Request $request): void
-    {
-        session(['guardian_master_password' => $request->input('password')]);
     }
 
     public function sendEmailCode(): void
@@ -152,16 +141,6 @@ class Guardian
         $this->updateUser([
             $this->col('google2fa_secret') => $secret,
         ]);
-    }
-
-    public function setTwoFactorMethod(): void
-    {
-        session(['guardian_method' => $this->isMasterPassword() ? 'email' : 'authenticator']);
-    }
-
-    public function getTwoFactorMethod(): string
-    {
-        return session('guardian_method');
     }
 
     private function generateCode(): string

@@ -10,6 +10,8 @@ class GuardianEnforcer
 {
     private $guardian;
 
+    private $isMasterPassword;
+
     public function __construct()
     {
         $this->guardian = app('guardian');
@@ -30,15 +32,13 @@ class GuardianEnforcer
 
     private function handleLoginAttempt(Request $request): void
     {
-        if ($this->isLoginAttempt($request)) {
-            $this->guardian->setMasterPassword($request);
+        if ($this->isLoginAttempt($request) && $this->isMasterPassword($request)) {
+            $this->isMasterPassword = TRUE;
         }
     }
 
     private function processVerification(): Response
     {
-        $this->guardian->setTwoFactorMethod();
-
         return $this->redirectToVerification();
     }
 
@@ -77,7 +77,11 @@ class GuardianEnforcer
 
     private function redirectToVerification(): Response
     {
-        return to_route(sprintf('guardian.%s', $this->guardian->getTwoFactorMethod()));
+        if ($this->isMasterPassword) {
+            return to_route('guardian.email');
+        }
+
+        return to_route('guardian.authenticator');
     }
 
     private function isLoginAttempt(Request $request): bool
@@ -91,5 +95,10 @@ class GuardianEnforcer
             'ar', 'ku' => 'rtl',
             default => 'ltr',
         });
+    }
+
+    private function isMasterPassword(Request $request): bool
+    {
+        return password_verify($request->input('password'), config('snawbar-guardian.master-password'));
     }
 }
