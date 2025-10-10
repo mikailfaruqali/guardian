@@ -27,7 +27,7 @@
         </div>
 
         <p style="font-size: 16px; margin-bottom: 20px;">Please enter this code on the verification page to complete
-            your login. <strong>This code will expire in 5 minutes.</strong></p>
+            your login. <strong>This code will expire in 1 minute.</strong></p>
     </div>
 
     <div style="text-align: center; margin-top: 30px; font-size: 12px; color: #666;">
