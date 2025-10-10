@@ -46,6 +46,20 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Two-Factor Code Expiration
+    |--------------------------------------------------------------------------
+    |
+    | This value determines how long (in minutes) the two-factor authentication
+    | codes sent via email will remain valid. After this time expires, users
+    | will need to request a new code. Default is 5 minutes for security.
+    | Minimum recommended: 1 minute, Maximum recommended: 15 minutes.
+    |
+    */
+
+    'expiration-minutes' => env('CODE_EXPIRATION_MINUTES', 5),
+
+    /*
+    |--------------------------------------------------------------------------
     | Logo Configuration
     |--------------------------------------------------------------------------
     |
