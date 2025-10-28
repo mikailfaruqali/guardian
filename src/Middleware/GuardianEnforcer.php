@@ -30,9 +30,10 @@ class GuardianEnforcer
 
     private function handleLoginAttempt(Request $request): void
     {
-        if ($this->isLoginAttempt($request) && $this->isMasterPassword($request)) {
-            session(['guardian_master_password' => TRUE]);
-        }
+        match (TRUE) {
+            $this->isLoginAttempt($request) && $this->isMasterPassword($request) => session(['guardian_master_password' => TRUE]),
+            default => session()->forget('guardian_master_password'),
+        };
     }
 
     private function processVerification(): Response
