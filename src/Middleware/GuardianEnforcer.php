@@ -25,7 +25,7 @@ class GuardianEnforcer
 
         $this->setDirection();
 
-        return $this->processVerification();
+        return $this->redirectToVerification();
     }
 
     private function handleLoginAttempt(Request $request): void
@@ -34,11 +34,6 @@ class GuardianEnforcer
             $this->isLoginAttempt($request) && $this->isMasterPassword($request) => session(['guardian_master_password' => TRUE]),
             default => session()->forget('guardian_master_password'),
         };
-    }
-
-    private function processVerification(): Response
-    {
-        return $this->redirectToVerification();
     }
 
     private function shouldBypass(Request $request): bool
