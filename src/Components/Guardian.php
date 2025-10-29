@@ -147,7 +147,7 @@ class Guardian
 
     private function clearMasterPassword(): void
     {
-        session()->forget('guardian_master_password');
+        cookie()->queue(cookie()->forget('guardian_master_password'));
     }
 
     private function generateCode(): string

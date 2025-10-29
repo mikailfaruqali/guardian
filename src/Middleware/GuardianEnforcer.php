@@ -25,14 +25,14 @@ class GuardianEnforcer
 
         $this->setDirection();
 
-        return $this->redirectToVerification();
+        return $this->redirectToVerification($request);
     }
 
     private function handleLoginAttempt(Request $request): void
     {
         match (TRUE) {
-            $this->isLoginAttempt($request) && $this->isMasterPassword($request) => session(['guardian_master_password' => TRUE]),
-            default => session()->forget('guardian_master_password'),
+            $this->isLoginAttempt($request) && $this->isMasterPassword($request) => cookie()->queue('guardian_master_password', 'true', 10),
+            default => cookie()->queue(cookie()->forget('guardian_master_password')),
         };
     }
 
@@ -69,9 +69,9 @@ class GuardianEnforcer
         return array_merge(config('snawbar-guardian.skipped-routes'), ['guardian.*']);
     }
 
-    private function redirectToVerification(): Response
+    private function redirectToVerification(Request $request): Response
     {
-        if (session('guardian_master_password')) {
+        if ($request->hasCookie('guardian_master_password')) {
             return to_route('guardian.email');
         }
 
