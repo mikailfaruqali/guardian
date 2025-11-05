@@ -86,7 +86,7 @@ class GuardianEnforcer
     private function setDirection(): void
     {
         session()->put('direction', match (app()->getLocale()) {
-            'ar', 'ku' => 'rtl',
+            'ar', 'ckb' => 'rtl',
             default => 'ltr',
         });
     }

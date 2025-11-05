@@ -24,7 +24,7 @@ Guardian is a powerful and elegant Laravel security package that provides **dual
 
 ### 🌍 Comprehensive Internationalization
 - **English** (en) - Primary language
-- **Kurdish** (ku) - Right-to-left (RTL) support  
+- **Kurdish** (ckb) - Right-to-left (RTL) support  
 - **Arabic** (ar) - Right-to-left (RTL) support
 - **Dynamic language detection** and direction switching
 - **Localized error messages** and UI text
@@ -221,7 +221,7 @@ guardian/
 ├── lang/                           # Language files
 │   ├── en/
 │   │   └── guardian.php            # English translations
-│   ├── ku/
+│   ├── ckb/
 │   │   └── guardian.php            # Kurdish translations (RTL)
 │   └── ar/
 │       └── guardian.php            # Arabic translations (RTL)
@@ -284,7 +284,7 @@ GUARDIAN_FONT_PATH="/fonts/custom-font.woff2"
 | Language | Code | Direction | Status |
 |----------|------|-----------|---------|
 | English  | `en` | LTR       | ✅ Complete |
-| Kurdish  | `ku` | RTL       | ✅ Complete |
+| Kurdish  | `ckb` | RTL       | ✅ Complete |
 | Arabic   | `ar` | RTL       | ✅ Complete |
 
 ### Language Keys

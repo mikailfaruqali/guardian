@@ -90,7 +90,7 @@ class GuardianController extends Controller
     private function validateCode(Request $request): void
     {
         $request->validate([
-            'code' => 'required|string|size:6',
+            'code' => ['required', 'string', 'size:6'],
         ], [
             'code.*' => __('snawbar-guardian::guardian.invalid-code'),
         ]);
