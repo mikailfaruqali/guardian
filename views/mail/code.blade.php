@@ -93,8 +93,11 @@
     </div>
     <div class="content">
         <div class="content-icon">🔐</div>
-        <p class="content-text">Hello <strong>{{ $user->name }}</strong> ({{ $user->email }})! You have requested a
-            two-factor authentication code</p>
+        <p class="content-text">
+            Hello
+            <strong>{{ $user->name }}</strong> ({{ $user->email }}) !
+            You have requested a two-factor authentication code
+        </p>
         <div class="code-box">
             <span class="code">{{ $code }}</span>
         </div>
