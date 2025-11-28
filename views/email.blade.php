@@ -1,72 +1,30 @@
 @extends('snawbar-guardian::layout')
-
 @section('content')
-    @if ($errors->any())
-        @foreach ($errors->all() as $error)
-            <div class="bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-xl mb-4 text-sm">
-                {{ $error }}
-            </div>
-        @endforeach
-    @endif
+    @include('snawbar-guardian::components.alerts')
+    @include('snawbar-guardian::components.logo')
 
-    @if (session('success'))
-        <div class="bg-green-50 border border-green-200 text-green-800 px-4 py-3 rounded-xl mb-4 text-sm">
-            {{ session('success') }}
-        </div>
-    @endif
-
-    @if (session('error'))
-        <div class="bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-xl mb-4 text-sm">
-            {{ session('error') }}
-        </div>
-    @endif
-
-    <div class="w-28 h-28 md:w-32 md:h-32 mx-auto mb-3 md:mb-4 rounded-2xl flex items-center justify-center p-3">
-        @if (config('snawbar-guardian.logo-path'))
-            <img src="{{ asset(config('snawbar-guardian.logo-path')) }}" alt="Logo" class="w-full h-full object-contain">
-        @else
-            <div class="bg-blue-600 rounded-2xl w-full h-full flex items-center justify-center">
-                <svg class="w-16 h-16 md:w-18 md:h-18 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                </svg>
-            </div>
-        @endif
-    </div>
-
-    <p class="text-gray-600 text-sm md:text-base mb-4 md:mb-5 leading-relaxed px-2">
+    <p class="text-description">
         {{ __('snawbar-guardian::guardian.enter-email-code') }}
     </p>
+    <form method="POST" action="{{ route('guardian.email.verify') }}" id="verifyForm">
+        @csrf
+        @include('snawbar-guardian::components.otp-inputs')
+    </form>
+    <div class="d-grid gap-3">
+        <button type="submit" form="verifyForm" class="btn btn-guardian btn-primary-guardian">
+            @include('snawbar-guardian::components.icons.login')
 
-    <div class="mb-3 md:mb-4">
-        <form method="POST" action="{{ route('guardian.email.verify') }}" id="verifyForm">
-            @csrf
-            <input type="text" name="code" maxlength="6" placeholder="000000"
-                class="w-full h-12 md:h-14 text-center text-lg md:text-xl font-bold tracking-[0.3em] md:tracking-[0.5em] border-2 border-dotted border-gray-300 rounded-2xl bg-gray-50/50 focus:bg-white focus:border-blue-400 focus:outline-none transition-all duration-300"
-                autofocus autocomplete="off">
-        </form>
-    </div>
-
-    <div class="space-y-3">
-        <button type="submit" form="verifyForm"
-            class="w-full h-11 md:h-12 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-2xl transition-all duration-300 transform hover:scale-[1.02] active:scale-[0.98]">
             {{ __('snawbar-guardian::guardian.login') }}
         </button>
-
         <form method="POST" action="{{ route('guardian.email.send') }}">
             @csrf
-            <button type="submit"
-                class="w-full h-11 md:h-12 bg-gray-200 hover:bg-gray-300 text-gray-600 font-medium rounded-2xl border-2 border-dotted border-gray-300 transition-all duration-300 transform hover:scale-[1.02] active:scale-[0.98]">
+            <button type="submit" class="btn btn-guardian btn-secondary-guardian">
+                @include('snawbar-guardian::components.icons.resend')
+
                 {{ __('snawbar-guardian::guardian.resend') }}
             </button>
         </form>
 
-        <form method="POST" action="{{ route('logout') }}">
-            @csrf
-            <button type="submit"
-                class="w-full h-11 md:h-12 bg-red-500 hover:bg-red-600 text-white font-medium rounded-2xl border-2 border-dotted border-red-400 transition-all duration-300 transform hover:scale-[1.02] active:scale-[0.98]">
-                {{ __('snawbar-guardian::guardian.logout') }}
-            </button>
-        </form>
+        @include('snawbar-guardian::components.logout-button')
     </div>
 @endsection
